@@ -6,6 +6,8 @@ byte memory[1<<16];
 uint16_t pc;
 int zflag; // zero flag
 int cflag; // carry flag
+int bflag = 1; // borrow flag
+
 /*
 * rstack: Return STACK => 1024 bytes long (512 cells/addresses)  0x0100-0x04ff
 * dstack: Data   STACK => 1024 bytes long (512 cells/addresses)  0x0500-0x08ff
@@ -54,7 +56,9 @@ cell_t dpopc(void) {
   byte lower = *dstack; // lower part of cell_t
   ++dstack;
   byte upper = *dstack; // upper part of cell_t
-  return (cell_t) (upper << 8) & (lower);
+  return (cell_t) (upper << 8) | (lower);
+  // took me 3 hours to find out that the | should be that and
+  // not a &. God dammit
 }
 
 byte fetch(void) {
@@ -79,14 +83,14 @@ void execute(byte op) {
     case PUSHC: {
       byte lower = fetch();
       byte upper = fetch();
-      cell_t c = (upper << 8) & (lower);
+      cell_t c = (upper << 8) | (lower);
       dpushc(c);
       break;
     }
     case ADDB: {
       byte a = dpopb();
       byte b = dpopb();
-      int result = b + a;
+      int result = b + a + cflag;
       if (result > 127) {
         cflag = 1;
         result -= 128;
@@ -98,19 +102,47 @@ void execute(byte op) {
     case SUBB: {
       byte a = dpopb();
       byte b = dpopb();
-      byte result = b - a;
-      cell_t check = (cell_t) b - (cell_t) a; //
+      int result = b + ~a + bflag;
+      bflag = (result < 0);
+      zflag = (result == 0);
+      dpushb((byte) result);
+      break;
+    }
+    case MULB: {
+      // 8 bit x 8 bit => 16 bit
+      byte a = dpopb();
+      byte b = dpopb();
+      int result = b * a;
+      zflag = (result == 0);
+      dpushc((cell_t) result);
+      break;
+    }
+    case DIVB: {
+      // 16 bit -:- 8 bit => 8bit & 8bit remainder
+      byte a = dpopb();
+      byte b = dpopc();
+      int result = b / (cell_t) a;
+      int r = b - (result * a); // remainder
+      zflag = (result == 0);
+      dpushb(r);
+      dpushb(result);
+      break;
     }
     case LOGB: {
       byte b = dpopb();
       printf("%d", b);
       break;
     }
+    case LOGC: {
+      cell_t c = dpopc();
+      printf("%d", c);
+      break;
+    }
   }
 }
 
 int loadFile(char *filename) {
-  pc = 8092;
+  pc = text - memory;
   FILE *file = fopen(filename, "r");
   fread((void *) text, 57444, 1, file);
   if (ferror(file)) {

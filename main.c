@@ -2,10 +2,7 @@
 
 int main(void) {
   if (loadFile("test.bin")) {
-    printf("error\n");
+    return -1;
   }
-  execute(fetch());
-  execute(fetch());
-  execute(fetch());
-  execute(fetch());
+  while(execute(fetch()));
 }

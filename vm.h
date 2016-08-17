@@ -36,7 +36,7 @@ cell_t dpopc(void); // pop cell off data stack
 void rpush(cell_t); // push cell onto return stack
 cell_t rpop(cell_t); // pop cell off return stack
 byte fetch(void); // fetch next instruction
-void execute(byte); // execute instruction
+int execute(byte); // execute instruction
 int loadFile(char *); // load file to memory
 
 #endif

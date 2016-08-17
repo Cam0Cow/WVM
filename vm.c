@@ -56,7 +56,8 @@ cell_t dpopc(void) {
   byte lower = *dstack; // lower part of cell_t
   ++dstack;
   byte upper = *dstack; // upper part of cell_t
-  return (cell_t) (upper << 8) | (lower);
+
+  return (cell_t) (upper << 8) | (uint8_t)(lower);
   // took me 3 hours to find out that the | should be that and
   // not a &. God dammit
 }
@@ -66,11 +67,11 @@ byte fetch(void) {
   return memory[pc++];
 }
 
-void execute(byte op) {
+int execute(byte op) {
   switch (op) {
     case BRK: {
       pc = 0xFFFF; // terminate program
-      break;
+      return 0;
     }
     case NOP: {
       break; // nothing to see here
@@ -91,6 +92,7 @@ void execute(byte op) {
       byte a = dpopb();
       byte b = dpopb();
       int result = b + a + cflag;
+      if (cflag) cflag = 0;
       if (result > 127) {
         cflag = 1;
         result -= 128;
@@ -120,12 +122,45 @@ void execute(byte op) {
     case DIVB: {
       // 16 bit -:- 8 bit => 8bit & 8bit remainder
       byte a = dpopb();
-      byte b = dpopc();
+      cell_t b = dpopc();
       int result = b / (cell_t) a;
       int r = b - (result * a); // remainder
       zflag = (result == 0);
-      dpushb(r);
-      dpushb(result);
+      dpushb((byte) r);
+      dpushb((byte) result);
+      break;
+    }
+    case ADDC: {
+      cell_t a = dpopc();
+      cell_t b = dpopc();
+      int result = b + a + cflag;
+      printf("%d = %d + %d\n", result, b, a);
+      if (cflag) cflag = 0;
+      if (result > 65535) {
+        cflag = 1;
+        result -= 65535;
+      }
+      zflag = (result == 0);
+      dpushc((cell_t) result);
+      break;
+    }
+    case SUBC: {
+      cell_t a = dpopc();
+      cell_t b = dpopc();
+      int result = b + ~a + bflag;
+      bflag = (result < 0);
+      zflag = (result == 0);
+      dpushc((cell_t) result);
+      break;
+    }
+    case MULC: {
+      // 16 bit x 16 bit = high 16bit & lower 16bit
+      cell_t a = dpopc();
+      cell_t b = dpopc();
+      int result = b * a;
+      zflag = (result == 0);
+      dpushc(result >> 16);
+      dpushc(result & 0xFFFF);
       break;
     }
     case LOGB: {
@@ -139,6 +174,7 @@ void execute(byte op) {
       break;
     }
   }
+  return 1;
 }
 
 int loadFile(char *filename) {

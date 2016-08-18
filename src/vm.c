@@ -121,6 +121,7 @@ int execute(byte op) {
     }
     case DIVB: {
       // 16 bit -:- 8 bit => 8bit & 8bit remainder
+      // result on top, remainder below
       byte a = dpopb();
       cell_t b = dpopc();
       int result = b / (cell_t) a;
@@ -163,6 +164,20 @@ int execute(byte op) {
       dpushc(result & 0xFFFF);
       break;
     }
+    case DIVC: {
+      // 32 bit -:- 16 bit = 16 bit & 16 bit remainder
+      // result on top, remainder below
+      cell_t a = dpopc();
+      cell_t bl = dpopc(); // higher 16 bit
+      cell_t bh = dpopc(); // lower 16 bit
+      int b = ((bh << 16) | (uint16_t) bl);
+      int result = b / a;
+      int r = b - (result * a);
+      zflag = (result == 0);
+      dpushc((cell_t) r);
+      dpushc((cell_t) result);
+      break;
+    }
     case LOGB: {
       byte b = dpopb();
       printf("%d", b);
@@ -180,6 +195,9 @@ int execute(byte op) {
 int loadFile(char *filename) {
   pc = text - memory;
   FILE *file = fopen(filename, "r");
+  if (!file) {
+    return -1;
+  }
   fread((void *) text, 57444, 1, file);
   if (ferror(file)) {
     fclose(file);

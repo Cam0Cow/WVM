@@ -1,7 +1,11 @@
 build:
-	cc src/*.c -o bin/vm
+	cc -O3 src/*.c -o bin/vm
 
 test:
-	./tests/test.lua
+	./tests/test.lua 2> /dev/null
 
-all: build test 
+debug:
+	cc -D DEBUG src/*.c -o bin/vm
+	./tests/test.lua 2> debug.log
+
+all: build test

@@ -70,21 +70,25 @@ byte fetch(void) {
 int execute(byte op) {
   switch (op) {
     case BRK: {
+      LOG("Terminating VM at pc %d\n", pc);
       pc = 0xFFFF; // terminate program
       return 0;
     }
     case NOP: {
+      LOG("NOP(e)\n");
       break; // nothing to see here
     }
     case PUSHB: {
       byte b = fetch();
+      LOG("Pushed byte %d at sp %ld\n", b, dstack - memory);
       dpushb(b);
       break;
     }
     case PUSHC: {
       byte lower = fetch();
       byte upper = fetch();
-      cell_t c = (upper << 8) | (lower);
+      cell_t c = (upper << 8) | (uint8_t)(lower);
+      LOG("Pushed cell %d at sp %ld\n", c, dstack-memory);
       dpushc(c);
       break;
     }
@@ -98,6 +102,7 @@ int execute(byte op) {
         result -= 128;
       }
       zflag = (result == 0);
+      LOG("%d = %d + %d, cflag=%d, zflag=%d\n", result, b, a, cflag, zflag);
       dpushb((byte) result);
       break;
     }
@@ -107,6 +112,7 @@ int execute(byte op) {
       int result = b + ~a + bflag;
       bflag = (result < 0);
       zflag = (result == 0);
+      LOG("%d = %d - %d, bflag=%d, zflag=%d\n", result, b, a, bflag, zflag);
       dpushb((byte) result);
       break;
     }
@@ -116,6 +122,7 @@ int execute(byte op) {
       byte b = dpopb();
       int result = b * a;
       zflag = (result == 0);
+      LOG("%d = %d * %d, zflag=%d\n", result, b, a, zflag);
       dpushc((cell_t) result);
       break;
     }
@@ -127,6 +134,7 @@ int execute(byte op) {
       int result = b / (cell_t) a;
       int r = b - (result * a); // remainder
       zflag = (result == 0);
+      LOG("%d = %d / %d, remainder=%d, zflag=%d\n", result, b, a, r, zflag);
       dpushb((byte) r);
       dpushb((byte) result);
       break;
@@ -135,13 +143,13 @@ int execute(byte op) {
       cell_t a = dpopc();
       cell_t b = dpopc();
       int result = b + a + cflag;
-      printf("%d = %d + %d\n", result, b, a);
       if (cflag) cflag = 0;
       if (result > 65535) {
         cflag = 1;
         result -= 65535;
       }
       zflag = (result == 0);
+      LOG("%d = %d + %d, cflag=%d, zflag=%d\n", result, b, a, cflag, zflag);
       dpushc((cell_t) result);
       break;
     }
@@ -151,6 +159,7 @@ int execute(byte op) {
       int result = b + ~a + bflag;
       bflag = (result < 0);
       zflag = (result == 0);
+      LOG("%d = %d - %d, bflag=%d, zflag=%d\n", result, b, a, bflag, zflag);
       dpushc((cell_t) result);
       break;
     }
@@ -160,6 +169,7 @@ int execute(byte op) {
       cell_t b = dpopc();
       int result = b * a;
       zflag = (result == 0);
+      LOG("%d = %d * %d, zflag=%d\n", result, b, a, zflag);
       dpushc(result >> 16);
       dpushc(result & 0xFFFF);
       break;
@@ -168,12 +178,13 @@ int execute(byte op) {
       // 32 bit -:- 16 bit = 16 bit & 16 bit remainder
       // result on top, remainder below
       cell_t a = dpopc();
-      cell_t bl = dpopc(); // higher 16 bit
-      cell_t bh = dpopc(); // lower 16 bit
+      cell_t bl = dpopc(); // lower 16 bit
+      cell_t bh = dpopc(); // higher 16 bit
       int b = ((bh << 16) | (uint16_t) bl);
       int result = b / a;
       int r = b - (result * a);
       zflag = (result == 0);
+      LOG("%d = %d / %d, remainder=%d, zflag=%d\n", result, b, a, r, zflag);
       dpushc((cell_t) r);
       dpushc((cell_t) result);
       break;
@@ -183,9 +194,21 @@ int execute(byte op) {
       printf("%d", b);
       break;
     }
+    case PUTB: {
+      byte b = dpopb();
+      printf("%c", b);
+      break;
+    }
     case LOGC: {
       cell_t c = dpopc();
       printf("%d", c);
+      break;
+    }
+    case PUTC: {
+      // big endian ordering here, for easy string manipulation
+      byte a = dpopb();
+      byte b = dpopb();
+      printf("%c%c", a, b);
       break;
     }
   }

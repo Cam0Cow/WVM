@@ -1,6 +1,7 @@
 #ifndef vm_h
 #define vm_h
 #include <stdint.h>
+#include <stdio.h>
 
 #define cell_t int16_t
 #define byte int8_t
@@ -38,5 +39,15 @@ cell_t rpop(cell_t); // pop cell off return stack
 byte fetch(void); // fetch next instruction
 int execute(byte); // execute instruction
 int loadFile(char *); // load file to memory
+
+#ifdef DEBUG
+
+#define LOG(...) fprintf(stderr, __VA_ARGS__)
+
+#else
+
+#define LOG(...)
+
+#endif
 
 #endif

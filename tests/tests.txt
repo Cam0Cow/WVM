@@ -1,2 +1,12 @@
 addb.bin 7
 subb.bin 5
+mulb.bin 42
+divb.bin 10
+addc.bin 400
+subc.bin 300
+mulc.bin 30000
+divc.bin 3
+logb.bin 42
+putb.bin *
+logc.bin 300
+putc.bin ab

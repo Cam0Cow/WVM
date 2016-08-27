@@ -28,12 +28,18 @@
 #define PUTB 13 // print byte as an ASCII character
 #define LOGC 14 // print cell as a signed 16-bit integer
 #define PUTC 15 // print cell as two ASCII characters
+#define DUPB 16 // duplicate top byte
+#define DROPB 17 // drop top byte
+#define SWAPB 18 // swap top two bytes
+#define ROTB 19 // rotate third to top
 
 
 void dpushb(byte); // push byte onto data stack
 byte dpopb(void); // pop byte from data stack
+byte dpeekb(void); // peek at top of stack
 void dpushc(cell_t); // push cell onto data stack
 cell_t dpopc(void); // pop cell off data stack
+cell_t dpeekc(void); // peek at top of stack
 void rpush(cell_t); // push cell onto return stack
 cell_t rpop(cell_t); // pop cell off return stack
 byte fetch(void); // fetch next instruction

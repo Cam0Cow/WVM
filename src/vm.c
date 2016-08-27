@@ -44,6 +44,10 @@ byte dpopb(void) {
   return *dstack;
 }
 
+byte dpeekb(void) {
+  return *(dstack+1);
+}
+
 void dpushc(cell_t c) {
   *dstack = c >> 8; // upper part of cell_t
   --dstack;
@@ -60,6 +64,12 @@ cell_t dpopc(void) {
   return (cell_t) (upper << 8) | (uint8_t)(lower);
   // took me 3 hours to find out that the | should be that and
   // not a &. God dammit
+}
+
+cell_t dpeekc(void) {
+  byte lower = *(dstack + 1);
+  byte upper = *(dstack + 2);
+  return (cell_t) (upper << 8) | (uint8_t)(lower);
 }
 
 byte fetch(void) {
@@ -209,6 +219,34 @@ int execute(byte op) {
       byte a = dpopb();
       byte b = dpopb();
       printf("%c%c", a, b);
+      break;
+    }
+    case DUPB: {
+      byte a = dpeekb();
+      dpushb(a);
+      LOG("duplicated %d\n", a);
+      break;
+    }
+    case DROPB :{
+      (void) dpopb();
+      break;
+    }
+    case SWAPB: {
+      byte a = dpopb();
+      byte b = dpopb();
+      dpushb(a);
+      dpushb(b);
+      LOG("swapped %d and %d\n", a, b);
+      break;
+    }
+    case ROTB: {
+      byte a = dpopb();
+      byte b = dpopb();
+      byte c = dpopb();
+      dpushb(b);
+      dpushb(a);
+      dpushb(c);
+      LOG("rotated %d, %d, %d\n", a, b, c);
       break;
     }
   }

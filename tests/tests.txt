@@ -10,3 +10,6 @@ logb.bin 42
 putb.bin *
 logc.bin 300
 putc.bin ab
+dupb.bin 42
+swapb.bin 42
+rotb.bin 132

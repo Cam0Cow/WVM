@@ -31,7 +31,11 @@
 #define DUPB 16 // duplicate top byte
 #define DROPB 17 // drop top byte
 #define SWAPB 18 // swap top two bytes
-#define ROTB 19 // rotate third to top
+#define ROTB 19 // rotate third byte to top
+#define DUPC 20 // duplicate top cell
+#define DROPC 21 // drop top cell
+#define SWAPC 22 // swap top two cells
+#define ROTC 23 // rotate third cell to top
 
 
 void dpushb(byte); // push byte onto data stack

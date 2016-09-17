@@ -112,7 +112,8 @@ int execute(byte op) {
         result -= 128;
       }
       zflag = (result == 0);
-      LOG("%d = %d + %d, cflag=%d, zflag=%d\n", result, b, a, cflag, zflag);
+      LOG("%d = %d + %d, cflag=%d, zflag=%d", result, b, a, cflag, zflag);
+      LOG(" (bytes)\n");
       dpushb((byte) result);
       break;
     }
@@ -122,7 +123,8 @@ int execute(byte op) {
       int result = b + ~a + bflag;
       bflag = (result < 0);
       zflag = (result == 0);
-      LOG("%d = %d - %d, bflag=%d, zflag=%d\n", result, b, a, bflag, zflag);
+      LOG("%d = %d - %d, bflag=%d, zflag=%d", result, b, a, bflag, zflag);
+      LOG(" (bytes)\n");
       dpushb((byte) result);
       break;
     }
@@ -132,7 +134,8 @@ int execute(byte op) {
       byte b = dpopb();
       int result = b * a;
       zflag = (result == 0);
-      LOG("%d = %d * %d, zflag=%d\n", result, b, a, zflag);
+      LOG("%d = %d * %d, zflag=%d", result, b, a, zflag);
+      LOG(" (bytes)\n");
       dpushc((cell_t) result);
       break;
     }
@@ -144,7 +147,8 @@ int execute(byte op) {
       int result = b / (cell_t) a;
       int r = b - (result * a); // remainder
       zflag = (result == 0);
-      LOG("%d = %d / %d, remainder=%d, zflag=%d\n", result, b, a, r, zflag);
+      LOG("%d = %d / %d, remainder=%d, zflag=%d", result, b, a, r, zflag);
+      LOG(" (bytes)\n");
       dpushb((byte) r);
       dpushb((byte) result);
       break;
@@ -159,7 +163,8 @@ int execute(byte op) {
         result -= 65535;
       }
       zflag = (result == 0);
-      LOG("%d = %d + %d, cflag=%d, zflag=%d\n", result, b, a, cflag, zflag);
+      LOG("%d = %d + %d, cflag=%d, zflag=%d", result, b, a, cflag, zflag);
+      LOG(" (cells)\n");
       dpushc((cell_t) result);
       break;
     }
@@ -169,7 +174,8 @@ int execute(byte op) {
       int result = b + ~a + bflag;
       bflag = (result < 0);
       zflag = (result == 0);
-      LOG("%d = %d - %d, bflag=%d, zflag=%d\n", result, b, a, bflag, zflag);
+      LOG("%d = %d - %d, bflag=%d, zflag=%d", result, b, a, bflag, zflag);
+      LOG(" (cells)\n");
       dpushc((cell_t) result);
       break;
     }
@@ -179,7 +185,8 @@ int execute(byte op) {
       cell_t b = dpopc();
       int result = b * a;
       zflag = (result == 0);
-      LOG("%d = %d * %d, zflag=%d\n", result, b, a, zflag);
+      LOG("%d = %d * %d, zflag=%d", result, b, a, zflag);
+      LOG(" (cells)\n");
       dpushc(result >> 16);
       dpushc(result & 0xFFFF);
       break;
@@ -194,7 +201,8 @@ int execute(byte op) {
       int result = b / a;
       int r = b - (result * a);
       zflag = (result == 0);
-      LOG("%d = %d / %d, remainder=%d, zflag=%d\n", result, b, a, r, zflag);
+      LOG("%d = %d / %d, remainder=%d, zflag=%d", result, b, a, r, zflag);
+      LOG(" (cells)\n");
       dpushc((cell_t) r);
       dpushc((cell_t) result);
       break;
@@ -202,16 +210,19 @@ int execute(byte op) {
     case LOGB: {
       byte b = dpopb();
       printf("%d", b);
+      LOG("printed byte as integer\n");
       break;
     }
     case PUTB: {
       byte b = dpopb();
       printf("%c", b);
+      LOG("printed byte as character\n");
       break;
     }
     case LOGC: {
       cell_t c = dpopc();
       printf("%d", c);
+      LOG("printed cell as integer\n");
       break;
     }
     case PUTC: {
@@ -219,16 +230,18 @@ int execute(byte op) {
       byte a = dpopb();
       byte b = dpopb();
       printf("%c%c", a, b);
+      LOG("printed cell as characters\n");
       break;
     }
     case DUPB: {
       byte a = dpeekb();
       dpushb(a);
-      LOG("duplicated %d\n", a);
+      LOG("duplicated (byte) %d\n", a);
       break;
     }
     case DROPB :{
       (void) dpopb();
+      LOG("dropped top byte\n");
       break;
     }
     case SWAPB: {
@@ -236,7 +249,7 @@ int execute(byte op) {
       byte b = dpopb();
       dpushb(a);
       dpushb(b);
-      LOG("swapped %d and %d\n", a, b);
+      LOG("swapped (bytes) %d and %d\n", a, b);
       break;
     }
     case ROTB: {
@@ -246,7 +259,36 @@ int execute(byte op) {
       dpushb(b);
       dpushb(a);
       dpushb(c);
-      LOG("rotated %d, %d, %d\n", a, b, c);
+      LOG("rotated (bytes) %d, %d, %d\n", a, b, c);
+      break;
+    }
+    case DUPC: {
+      cell_t c = dpeekc();
+      dpushc(c);
+      LOG("duplicated (cell) %d\n", c);
+      break;
+    }
+    case DROPC: {
+      (void) dpopc();
+      LOG("dropped top cell\n");
+      break;
+    }
+    case SWAPC: {
+      cell_t a = dpopc();
+      cell_t b = dpopc();
+      dpushc(a);
+      dpushc(b);
+      LOG("swapped (cells) %d and %d\n", a, b);
+      break;
+    }
+    case ROTC: {
+      cell_t a = dpopc();
+      cell_t b = dpopc();
+      cell_t c = dpopc();
+      dpushc(b);
+      dpushc(a);
+      dpushc(c);
+      LOG("rotated (cells) %d, %d, %d\n", a, b, c);
       break;
     }
   }

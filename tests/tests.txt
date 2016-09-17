@@ -13,3 +13,6 @@ putc.bin ab
 dupb.bin 42
 swapb.bin 42
 rotb.bin 132
+dupc.bin 10000 
+swapc.bin 100300
+rotc.bin 132

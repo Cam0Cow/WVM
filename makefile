@@ -1,5 +1,6 @@
 build:
 	cc -O3 src/*.c -o bin/vm
+	cc -O3 src/assembler/*.c -o bin/dis
 
 test:
 	./tests/test.lua 2> /dev/null
@@ -11,5 +12,5 @@ debug:
 all: build test
 
 clean:
-	-rm bin/vm
+	-rm bin/*
 	-rm debug.log

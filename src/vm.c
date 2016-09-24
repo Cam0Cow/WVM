@@ -19,7 +19,7 @@ int bflag = 1; // borrow flag
 cell_t *rstack = (cell_t *) (memory + 1279);
 byte *dstack = (memory + 2303);
 byte *data  = (memory + 2304);
-const byte *text = (memory + 8092);
+const byte *text = (memory + 8192);
 
 
 static int dstackSize(void) {
@@ -289,6 +289,20 @@ int execute(byte op) {
       dpushc(a);
       dpushc(c);
       LOG("rotated (cells) %d, %d, %d\n", a, b, c);
+      break;
+    }
+    case IN: {
+      char c = getchar();
+      LOG("got character \'%c\'\n", c);
+      dpushb(c);
+      break;
+    }
+    case JMP: {
+      byte lower = fetch();
+      byte upper = fetch();
+      cell_t c = (upper << 8) | (uint8_t)(lower);
+      pc = c; // do the actual jump
+      LOG("jumped to %d\n", c);
       break;
     }
   }

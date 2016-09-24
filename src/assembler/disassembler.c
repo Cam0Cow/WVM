@@ -29,7 +29,9 @@ char *opcodes[] = {
   "DUPC",
   "DROPC",
   "SWAPC",
-  "ROTC"
+  "ROTC",
+  "IN",
+  "JMP"
 };
 
 int main(int argc, char *argv[]) {
@@ -45,10 +47,14 @@ int main(int argc, char *argv[]) {
   int length = fread((void *) code, 1, MAX_SIZE, file);
   int pc = 0;
   while (pc < length) {
+    printf("%d: ", pc + 8192);
     if (code[pc] == 2) {
       printf("%s %d\n", opcodes[code[pc]], code[pc+1]);
       pc +=2;
     } else if (code[pc] == 3) {
+      printf("%s %d\n", opcodes[code[pc]], (code[pc+2] << 8) | code[pc+1]);
+      pc += 3;
+    } else if (code[pc] == 25) {
       printf("%s %d\n", opcodes[code[pc]], (code[pc+2] << 8) | code[pc+1]);
       pc += 3;
     } else {

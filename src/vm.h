@@ -36,6 +36,8 @@
 #define DROPC 21 // drop top cell
 #define SWAPC 22 // swap top two cells
 #define ROTC 23 // rotate third cell to top
+#define IN 24 // push character on top of stack
+#define JMP 25 // constant jump e.g. JMP 0x6000
 
 
 void dpushb(byte); // push byte onto data stack

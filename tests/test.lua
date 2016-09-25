@@ -12,6 +12,7 @@ for line in io.lines 'tests/tests.txt' do
 		success = os.execute('./bin/vm > '.. tmpf .. ' tests/' .. tbl[1]) -- run vm with filename
 		local f = io.open(tmpf, 'r')
 		local l = f:read()
+		if not l then l = '' end
 		if l == tbl[2] then
 			print (tbl[1] .. ' successful: ' .. l .. ' = ' .. tbl[2])
 		else

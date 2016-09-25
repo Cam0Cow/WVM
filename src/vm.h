@@ -37,7 +37,12 @@
 #define SWAPC 22 // swap top two cells
 #define ROTC 23 // rotate third cell to top
 #define IN 24 // push character on top of stack
-#define JMP 25 // constant jump e.g. JMP 0x6000
+#define JZ 25 // jump relative if top of stack == 0
+#define JMP 26 // constant jump e.g. JMP 0x6000
+#define LDB 27 // load byte from memory
+#define STRB 28 // store byte to memory
+#define LDC 29 // load cell from memory
+#define STRC 30 // store cell to memory
 
 
 void dpushb(byte); // push byte onto data stack

@@ -121,7 +121,7 @@ int execute(byte op) {
       byte a = dpopb();
       byte b = dpopb();
       int result = b + ~a + bflag;
-      bflag = (result < 0);
+      bflag = !(result < 0);
       zflag = (result == 0);
       LOG("%d = %d - %d, bflag=%d, zflag=%d", result, b, a, bflag, zflag);
       LOG(" (bytes)\n");
@@ -172,7 +172,7 @@ int execute(byte op) {
       cell_t a = dpopc();
       cell_t b = dpopc();
       int result = b + ~a + bflag;
-      bflag = (result < 0);
+      bflag = !(result < 0);
       zflag = (result == 0);
       LOG("%d = %d - %d, bflag=%d, zflag=%d", result, b, a, bflag, zflag);
       LOG(" (cells)\n");
@@ -297,12 +297,36 @@ int execute(byte op) {
       dpushb(c);
       break;
     }
+    case JZ: {
+      byte r = fetch();
+      if (!dpopb()) {
+        pc += r;
+        LOG("branched to %d\n", pc);
+      } else {
+        LOG("branch not taken at pc = %d\n", pc);
+      }
+      break;
+    }
     case JMP: {
       byte lower = fetch();
       byte upper = fetch();
-      cell_t c = (upper << 8) | (uint8_t)(lower);
+      uint16_t c = (upper << 8) | (uint8_t)(lower);
       pc = c; // do the actual jump
       LOG("jumped to %d\n", c);
+      break;
+    }
+    case LDB: {
+      uint16_t a = dpopc();
+      byte b = memory[a];
+      LOG("fetched byte %d from memory location %d\n", b, a);
+      dpushb(b);
+      break;
+    }
+    case STRB: {
+      byte b = dpopb();
+      uint16_t a = dpopc();
+      LOG("stored byte %d at memory location %d\n", b, a);
+      memory[a] = b;
       break;
     }
   }

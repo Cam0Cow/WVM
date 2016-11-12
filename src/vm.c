@@ -297,9 +297,9 @@ int execute(byte op) {
       dpushb(c);
       break;
     }
-    case JZ: {
+    case JT: {
       byte r = fetch();
-      if (!dpopb()) {
+      if (dpopb() == -1) {
         pc += r;
         LOG("branched to %d\n", pc);
       } else {
@@ -327,6 +327,177 @@ int execute(byte op) {
       uint16_t a = dpopc();
       LOG("stored byte %d at memory location %d\n", b, a);
       memory[a] = b;
+      break;
+    }
+    case LDC: {
+      uint16_t a = dpopc();
+      cell_t b = memory[a] | (memory[a+1] << 8);
+      LOG("fetched cell %d from memory location %d\n", b, a);
+      dpushc(b);
+      break;
+    }
+    case STRC: {
+      cell_t c = dpopc();
+      uint16_t a = dpopc();
+      memory[a] = c & 0xff;
+      memory[a+1] = c >> 8;
+      LOG("sotred cell %d at memory location %d\n", c, a);
+      break;
+    }
+    case NOTB: {
+      uint8_t b = dpopb();
+      uint8_t nb = ~b;
+      LOG("%d =  NOT %d (bytes)\n", nb, b);
+      dpushb(nb);
+      break;
+    }
+    case ANDB: {
+      uint8_t a = dpopb();
+      uint8_t b = dpopb();
+      uint8_t c = a & b;
+      LOG("%d = %d AND %d (bytes)\n", c, b, a);
+      dpushb(c);
+      break;
+    }
+    case ORB: {
+      uint8_t a = dpopb();
+      uint8_t b = dpopb();
+      uint8_t c = a | b;
+      LOG("%d = %d OR %d (bytes)\n", c, b, a);
+      dpushb(c);
+      break;
+    }
+    case XORB: {
+      uint8_t a = dpopb();
+      uint8_t b = dpopb();
+      uint8_t c = a ^ b;
+      LOG("%d = %d ^ %d (bytes)\n", c, b, a);
+      dpushb(c);
+      break;
+    }
+    case NOTC: {
+      uint16_t a = dpopc();
+      uint16_t na = ~a;
+      LOG("%d = ~%d (cells)\n", na, a);
+      dpushc(na);
+      break;
+    }
+    case ANDC: {
+      uint16_t a = dpopc();
+      uint16_t b = dpopc();
+      uint16_t c = a & b;
+      LOG("%d = %d & %d (cells)\n", c, b, a);
+      dpushc(c);
+      break;
+    }
+    case ORC: {
+      uint16_t a = dpopc();
+      uint16_t b = dpopc();
+      uint16_t c = a | b;
+      LOG("%d = %d | %d (cells)\n", c, b, a);
+      dpushc(c);
+      break;
+    }
+    case XORC: {
+      uint16_t a = dpopc();
+      uint16_t b = dpopc();
+      uint16_t c = a ^ b;
+      LOG("%d = %d ^ %d (cells)\n", c, b, a);
+      dpushc(c);
+      break;
+    }
+    case LTB: {
+      byte a = dpopb();
+      byte b = dpopb();
+      byte r = (b < a) ? -1 : 0;
+      LOG("%d < %d (bytes)? %s\n", b, a, r ? "true" : "false");
+      dpushb(r);
+      break;
+    }
+    case LEB: {
+      byte a = dpopb();
+      byte b = dpopb();
+      byte r = (b <= a) ? -1 : 0;
+      LOG("%d <= %d (bytes)? %s\n", b, a, r ? "true" : "false");
+      dpushb(r);
+      break;
+    }
+    case EQB: {
+      byte a = dpopb();
+      byte b = dpopb();
+      byte r = (b == a) ? -1 : 0;
+      LOG("%d == %d (bytes)? %s\n", b, a, r ? "true" : "false");
+      dpushb(r);
+      break;
+    }
+    case GTB: {
+      byte a = dpopb();
+      byte b = dpopb();
+      byte r = (b > a) ? -1 : 0;
+      LOG("%d > %d (bytes)? %s\n", b, a, r ? "true" : "false");
+      dpushb(r);
+      break;
+    }
+    case GEB: {
+      byte a = dpopb();
+      byte b = dpopb();
+      byte r = (b >= a) ? -1 : 0;
+      LOG("%d >= %d (bytes)? %s\n", b, a, r ? "true" : "false");
+      dpushb(r);
+      break;
+    }
+    case LTC: {
+      cell_t a = dpopb();
+      cell_t b = dpopb();
+      cell_t r = (b < a) ? -1 : 0;
+      LOG("%d < %d (cells)? %s\n", b, a, r ? "true" : "false");
+      dpushc(r);
+      break;
+    }
+    case LEC: {
+      cell_t a = dpopb();
+      cell_t b = dpopb();
+      cell_t r = (b <= a) ? -1 : 0;
+      LOG("%d <= %d (cells)? %s\n", b, a, r ? "true" : "false");
+      dpushc(r);
+      break;
+    }
+    case EQC: {
+      cell_t a = dpopb();
+      cell_t b = dpopb();
+      cell_t r = (b == a) ? -1 : 0;
+      LOG("%d == %d (cells)? %s\n", b, a, r ? "true" : "false");
+      dpushc(r);
+      break;
+    }
+    case GTC: {
+      cell_t a = dpopb();
+      cell_t b = dpopb();
+      cell_t r = (b > a) ? -1 : 0;
+      LOG("%d > %d (cells)? %s\n", b, a, r ? "true" : "false");
+      dpushc(r);
+      break;
+    }
+    case GEC: {
+      cell_t a = dpopb();
+      cell_t b = dpopb();
+      cell_t r = (b >= a) ? -1 : 0;
+      LOG("%d >= %d (cells)? %s\n", b, a, r ? "true" : "false");
+      dpushc(r);
+      break;
+    }
+    case SEB: {
+      byte b = dpopb();
+      cell_t bx = (cell_t) b;
+      LOG("sign extended %d as signed\n", bx);
+      dpushc(bx);
+      break;
+    }
+    case UEB: {
+      uint8_t a = dpopb();
+      uint16_t exa = (uint16_t) a;
+      LOG("signed extended %d as unsigned\n", exa);
+      dpushc(exa);
       break;
     }
   }

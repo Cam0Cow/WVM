@@ -4,7 +4,7 @@ local tmpf = os.tmpname()
 local success = true
 
 for line in io.lines 'tests/tests.txt' do
-	if line ~= '' then
+	if line ~= '' and line:sub(1,1) ~= '#' then
 		local tbl = {}
 		for k in line:gmatch '%S+' do
 			table.insert(tbl, k)
@@ -20,6 +20,8 @@ for line in io.lines 'tests/tests.txt' do
 			success = false
 		end
 		io.stderr:write(string.rep('=', 60) .. '\n')
+		f.close()
+		os.execute("rm " .. tmpf)
 	end
 end
 

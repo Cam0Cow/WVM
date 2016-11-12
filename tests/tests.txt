@@ -16,6 +16,29 @@ rotb.bin 132
 dupc.bin 10000 
 swapc.bin 100300
 rotc.bin 132
-jz.bin a
+jt.bin a
 jmp.bin a
 ldb.bin a
+strb.bin a
+ldc.bin ab
+# strc.bin
+notb.bin -1
+andb.bin -55
+orb.bin 10
+xorb.bin 0
+notc.bin -1
+andc.bin
+orc.bin
+xorc.bin
+ltb.bin
+leb.bin
+eqb.bin
+gtb.bin
+geb.bin
+ltc.bin
+lec.bin
+eqc.bin
+gtc.bin
+gec.bin
+seb.bin -113
+ueb.bin 127

@@ -14,4 +14,5 @@ all: build test
 
 clean:
 	-rm bin/*
+	mkdir bin
 	-rm debug.log

@@ -31,12 +31,33 @@ char *opcodes[] = {
   "SWAPC",
   "ROTC",
   "IN",
-  "JZ",
+  "[WIP]",
+  "JT",
   "JMP",
   "LDB",
   "STRB",
   "LDC",
-  "STRC"
+  "STRC",
+  "NOTB",
+  "ANDB",
+  "ORB",
+  "XORB",
+  "NOTC",
+  "ANDC",
+  "ORC",
+  "XORC",
+  "LTB",
+  "LEB",
+  "EQB",
+  "GTB",
+  "GEB",
+  "LTC",
+  "LEC",
+  "EQC",
+  "GTC",
+  "GEC"
+  "SEB",
+  "UEB"
 };
 
 int main(int argc, char *argv[]) {
@@ -59,11 +80,12 @@ int main(int argc, char *argv[]) {
     } else if (code[pc] == 3) {
       printf("%s %d\n", opcodes[code[pc]], (code[pc+2] << 8) | code[pc+1]);
       pc += 3;
-    } else if (code[pc] == 26) {
+    } else if (code[pc] == 27) {
       printf("%s %d\n", opcodes[code[pc]], (code[pc+2] << 8) | code[pc+1]);
       pc += 3;
-    } else if (code[pc] == 25) {
-      printf("%s %d\n", opcodes[code[pc]], code[pc+1]);
+    } else if (code[pc] == 26) {
+      int offset = code[pc+1];
+      printf("%s %d (to %d)\n", opcodes[code[pc]], offset, offset+pc+8192);
       pc += 2;
     } else {
       printf("%s\n", opcodes[code[pc]]);

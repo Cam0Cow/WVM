@@ -11,10 +11,11 @@ As well as being dual-stack, the WVM is also dual-size oriented; each
 instruction has both a byte variant and a cell (16 bit) variant.
 
 some sample code:
-
+```
 pushb 6
 pushb 7
 mulb
 logb
+```
 
 which prints 42

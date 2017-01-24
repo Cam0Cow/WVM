@@ -55,7 +55,7 @@ char *opcodes[] = {
   "LEC",
   "EQC",
   "GTC",
-  "GEC"
+  "GEC",
   "SEB",
   "UEB"
 };

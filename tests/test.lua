@@ -1,5 +1,3 @@
-#!/usr/local/bin/lua
-
 local tmpf = os.tmpname()
 local success = true
 
